@@ -11,6 +11,8 @@ echo "$SECONDS Started on: $(date)"
 # First notification in days, then last warning:
 FIRST="7"
 LAST="3"
+# pass expiry in days
+POLICY="60"
 
 # Sent from:
 FROM="admin@example.com"
@@ -29,8 +31,8 @@ USERINFO=$(ionice -c3 /opt/zimbra/bin/zmprov ga $USER)
 PASS_SET_DATE=$(echo "$USERINFO" | grep zimbraPasswordModifiedTime: | cut -d " " -f 2 | cut -c 1-8)
 NAME=$(echo "$USERINFO" | grep givenName | cut -d " " -f 2)
 
-# Make the date for expiry in 60 days from now.
-EXPIRES=$(date -d  "$PASS_SET_DATE 60 days" +%s)
+# Make the date for expiry from now.
+EXPIRES=$(date -d  "$PASS_SET_DATE $POLICY days" +%s)
 
 # Now, how many days until that?
 DEADLINE=$(( (($DATE - $EXPIRES)) / -86400 ))
@@ -48,7 +50,6 @@ Admin team
 
 "
 # Send it off depending on days, adding verbose statements for the 'log'
-
 # First warning
 if [[ "$DEADLINE" -eq "$FIRST" ]]
 then
@@ -65,9 +66,9 @@ then
     echo "Subject: $SUBJECT" "$BODY" | /opt/zimbra/postfix-2.7.5.2z/sbin/sendmail -f $FROM $USER
 	echo "Last chance for: $USER - $DEADLINE days left"
 	
-# Check for Expired accounts, get last logon date add them to EXP_LIST2
-elif [[ "$DEADLINE" -lt "0" ]] && [ $(date +%d) = "01" ]
-then 
+# Check for Expired accounts, get last logon date add them to EXP_LIST2 every monday
+elif [[ "$DEADLINE" -lt "0" ]] && [ $(date +%a) = "Mon" ] 
+ then 
     LASTDATE=$(echo "$USERINFO" | grep zimbraLastLogonTimestamp | cut -d " " -f 2 | cut -c 1-8)
     LOGON=$(date -d "$LASTDATE")
 	EXP_LIST=$(echo "$USER's password has been expired for ${DEADLINE#-} day(s) now, last logon was $LOGON.")
