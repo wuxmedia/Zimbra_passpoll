@@ -13,11 +13,10 @@ FIRST="7"
 LAST="3"
 # pass expiry in days
 POLICY="60"
-
 # Sent from:
 FROM="admin@example.com"
 
- Get all users - it should run once only.
+# Get all users - it should run once only.
 USERS=$(ionice -c3 /opt/zimbra/bin/zmprov -l gaa example.com)
 
 #Todays date, in seconds:
@@ -75,8 +74,8 @@ elif [[ "$DEADLINE" -lt "0" ]] && [ $(date +%a) = "Mon" ]
 	EXP_LIST2="$EXP_LIST2 \n $EXP_LIST"
 
 else 
-# Uncomment for very verbose logs and a list of users.
-#    echo "$USER is fine, $DEADLINE days till password expiry"
+# > /dev/null for less verbose logs and a list of users.
+    echo "Account: $USER reports; $DEADLINE days on Password policy"
 fi
 
 # Finish for loop
