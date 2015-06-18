@@ -95,7 +95,7 @@ echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 EXP_BODY="
 Hello Admin team,
 
-This is the monthly list of expired passwords and their last recorded login date:
+List of expired passwords and their last recorded login date:
 $(echo -e "$EXP_LIST2")
 
 Regards,
