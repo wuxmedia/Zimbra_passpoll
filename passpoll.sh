@@ -59,17 +59,17 @@ Admin team
 # First warning
 if [[ "$DEADLINE" -eq "$FIRST" ]]
 then
-	echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f $FROM "$USER"
+	echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
 	echo "Reminder email sent to: $USER - $DEADLINE days left" 
 # Second
 elif [[ "$DEADLINE" -eq "$LAST" ]]
 then
-	echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f $FROM "$USER"
+	echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
 	echo "Reminder email sent to: $USER - $DEADLINE days left"
 # Final
 elif [[ "$DEADLINE" -eq "1" ]]
 then
-    echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f $FROM "$USER"
+    echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
 	echo "Last chance for: $USER - $DEADLINE days left"
 	
 # Check for Expired accounts, get last logon date add them to EXP_LIST2 every monday
@@ -101,7 +101,7 @@ $(echo -e "$EXP_LIST2")
 Regards,
 Support.
 "
-echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | $SENDMAIL -f $FROM $ADMIN_RECIPIENT
+echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | $SENDMAIL -f "$FROM" "$ADMIN_RECIPIENT"
 # Expired accts, for the log:
 echo -e "$EXP_LIST2"
 
