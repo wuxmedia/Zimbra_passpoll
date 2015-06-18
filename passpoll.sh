@@ -15,12 +15,14 @@ LAST="3"
 POLICY="60"
 # Sent from:
 FROM="admin@example.com"
+# Domain to check, e.g. 'example.com'; leave blank for all
+DOMAIN=""
 
 # Sendmail executable
 SENDMAIL=/opt/zimbra/postfix/sbin/sendmail
 
 # Get all users - it should run once only.
-USERS=$(ionice -c3 /opt/zimbra/bin/zmprov -l gaa example.com)
+USERS=$(ionice -c3 /opt/zimbra/bin/zmprov -l gaa $DOMAIN)
 
 #Todays date, in seconds:
 DATE=$(date +%s)
