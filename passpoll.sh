@@ -17,6 +17,8 @@ POLICY="60"
 FROM="admin@example.com"
 # Domain to check, e.g. 'example.com'; leave blank for all
 DOMAIN=""
+# Recipient who should receive an email with all expired accounts
+ADMIN_RECIPIENT="admin@example.com"
 
 # Sendmail executable
 SENDMAIL=/opt/zimbra/postfix/sbin/sendmail
@@ -99,7 +101,7 @@ $(echo -e "$EXP_LIST2")
 Regards,
 Support.
 "
-echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | $SENDMAIL -f $FROM internalsupport@example.com
+echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | $SENDMAIL -f $FROM $ADMIN_RECIPIENT
 # Expired accts, for the log:
 echo -e "$EXP_LIST2"
 
