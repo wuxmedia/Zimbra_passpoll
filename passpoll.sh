@@ -99,7 +99,7 @@ $(echo -e "$EXP_LIST2")
 Regards,
 Support.
 "
-echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | $SENDMAIL -f  adminuser@example.com internalsupport@example.com
+echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | $SENDMAIL -f $FROM internalsupport@example.com
 # Expired accts, for the log:
 echo -e "$EXP_LIST2"
 
