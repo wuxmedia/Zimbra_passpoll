@@ -15,9 +15,16 @@ LAST="3"
 POLICY="60"
 # Sent from:
 FROM="admin@example.com"
+# Domain to check, e.g. 'example.com'; leave blank for all
+DOMAIN=""
+# Recipient who should receive an email with all expired accounts
+ADMIN_RECIPIENT="admin@example.com"
+
+# Sendmail executable
+SENDMAIL=/opt/zimbra/postfix/sbin/sendmail
 
 # Get all users - it should run once only.
-USERS=$(ionice -c3 /opt/zimbra/bin/zmprov -l gaa example.com)
+USERS=$(ionice -c3 /opt/zimbra/bin/zmprov -l gaa $DOMAIN)
 
 #Todays date, in seconds:
 DATE=$(date +%s)
@@ -52,17 +59,17 @@ Admin team
 # First warning
 if [[ "$DEADLINE" -eq "$FIRST" ]]
 then
-	echo "Subject: $SUBJECT" "$BODY" | /opt/zimbra/postfix-2.7.5.2z/sbin/sendmail -f $FROM "$USER"
+	echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
 	echo "Reminder email sent to: $USER - $DEADLINE days left" 
 # Second
 elif [[ "$DEADLINE" -eq "$LAST" ]]
 then
-	echo "Subject: $SUBJECT" "$BODY" | /opt/zimbra/postfix-2.7.5.2z/sbin/sendmail -f $FROM "$USER"
+	echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
 	echo "Reminder email sent to: $USER - $DEADLINE days left"
 # Final
 elif [[ "$DEADLINE" -eq "1" ]]
 then
-    echo "Subject: $SUBJECT" "$BODY" | /opt/zimbra/postfix-2.7.5.2z/sbin/sendmail -f $FROM "$USER"
+    echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
 	echo "Last chance for: $USER - $DEADLINE days left"
 	
 # Check for Expired accounts, get last logon date add them to EXP_LIST2 every monday
@@ -88,13 +95,13 @@ echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 EXP_BODY="
 Hello Admin team,
 
-This is the monthly list of expired passwords and their last recorded login date:
+List of expired passwords and their last recorded login date:
 $(echo -e "$EXP_LIST2")
 
 Regards,
 Support.
 "
-echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | /opt/zimbra/postfix-2.7.5.2z/sbin/sendmail -f  adminuser@example.com internalsupport@example.com
+echo "Subject: List of accounts with expired passwords" "$EXP_BODY" | $SENDMAIL -f "$FROM" "$ADMIN_RECIPIENT"
 # Expired accts, for the log:
 echo -e "$EXP_LIST2"
 
