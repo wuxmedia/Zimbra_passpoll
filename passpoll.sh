@@ -33,7 +33,7 @@ DATE=$(date +%s)
 for USER in $USERS
  do
 # When was the password set?
-USERINFO=$(ionice -c3 /opt/zimbra/bin/zmprov ga $USER)
+USERINFO=$(ionice -c3 /opt/zimbra/bin/zmprov ga "$USER")
 PASS_SET_DATE=$(echo "$USERINFO" | grep zimbraPasswordModifiedTime: | cut -d " " -f 2 | cut -c 1-8)
 NAME=$(echo "$USERINFO" | grep givenName | cut -d " " -f 2)
 
@@ -48,7 +48,7 @@ SUBJECT="$NAME - Your Password will expire in $DEADLINE days"
 BODY="
 Hi $NAME,
 
-Your account password will expire in "$DEADLINE" days, Please reset your password soon.
+Your account password will expire in $DEADLINE days, Please reset your password soon.
 You may also enter a zimbra calendar event to remind you.
 
 Thanks, 
@@ -73,7 +73,7 @@ then
 	echo "Last chance for: $USER - $DEADLINE days left"
 	
 # Check for Expired accounts, get last logon date add them to EXP_LIST2 every monday
-elif [[ "$DEADLINE" -lt "0" ]] && [ '$(date +%a) = "Mon"' ] 
+elif [[ "$DEADLINE" -lt "0" ]] && [ "$(date +%a)" = "Mon" ] 
  then 
     LASTDATE=$(echo "$USERINFO" | grep zimbraLastLogonTimestamp | cut -d " " -f 2 | cut -c 1-8)
     LOGON=$(date -d "$LASTDATE")
