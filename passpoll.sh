@@ -21,7 +21,7 @@ DOMAIN=""
 ADMIN_RECIPIENT="admin@example.com"
 
 # Sendmail executable
-SENDMAIL=/opt/zimbra/postfix/sbin/sendmail
+SENDMAIL=$(ionice -c3 find /opt/zimbra/postfix* -type f -iname sendmail)
 
 # Get all users - it should run once only.
 USERS=$(ionice -c3 /opt/zimbra/bin/zmprov -l gaa $DOMAIN)
