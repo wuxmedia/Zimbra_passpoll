@@ -1,7 +1,7 @@
 #!/bin/bash
 # TDH 2015-04-27
 # Messy script for zimbra password expiry email notification.
-# Meant to be performed as daily cronjob run as zimbra user. 
+# Meant to be performed as daily cronjob run as zimbra user.
 # redirect output to a file to get a 'log file' of sorts.
 
 # Time taken of script;
@@ -11,8 +11,6 @@ echo "$SECONDS Started on: $(date)"
 # First notification in days, then last warning:
 FIRST="7"
 LAST="3"
-# pass expiry in days
-POLICY="60"
 # Sent from:
 FROM="admin@example.com"
 # Domain to check, e.g. 'example.com'; leave blank for all
@@ -35,10 +33,17 @@ for USER in $USERS
 # When was the password set?
 USERINFO=$(ionice -c3 /opt/zimbra/bin/zmprov ga "$USER")
 PASS_SET_DATE=$(echo "$USERINFO" | grep zimbraPasswordModifiedTime: | cut -d " " -f 2 | cut -c 1-8)
+PASS_MAX_AGE=$(echo "$USERINFO" | grep "zimbraPasswordMaxAge:" | cut -d " " -f 2)
 NAME=$(echo "$USERINFO" | grep givenName | cut -d " " -f 2)
 
+# Check if we have set the account to no-expire
+if [[ "$PASS_MAX_AGE" -eq "0" ]]
+then
+  continue
+fi
+
 # Make the date for expiry from now.
-EXPIRES=$(date -d  "$PASS_SET_DATE $POLICY days" +%s)
+EXPIRES=$(date -d  "$PASS_SET_DATE $PASS_MAX_AGE days" +%s)
 
 # Now, how many days until that?
 DEADLINE=$(( (($DATE - $EXPIRES)) / -86400 ))
@@ -51,7 +56,7 @@ Hi $NAME,
 Your account password will expire in $DEADLINE days, Please reset your password soon.
 You may also enter a zimbra calendar event to remind you.
 
-Thanks, 
+Thanks,
 Admin team
 
 "
@@ -60,7 +65,7 @@ Admin team
 if [[ "$DEADLINE" -eq "$FIRST" ]]
 then
 	echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
-	echo "Reminder email sent to: $USER - $DEADLINE days left" 
+	echo "Reminder email sent to: $USER - $DEADLINE days left"
 # Second
 elif [[ "$DEADLINE" -eq "$LAST" ]]
 then
@@ -71,16 +76,16 @@ elif [[ "$DEADLINE" -eq "1" ]]
 then
     echo "Subject: $SUBJECT" "$BODY" | $SENDMAIL -f "$FROM" "$USER"
 	echo "Last chance for: $USER - $DEADLINE days left"
-	
+
 # Check for Expired accounts, get last logon date add them to EXP_LIST2 every monday
-elif [[ "$DEADLINE" -lt "0" ]] && [ "$(date +%a)" = "Mon" ] 
- then 
+elif [[ "$DEADLINE" -lt "0" ]] && [ "$(date +%a)" = "Mon" ]
+ then
     LASTDATE=$(echo "$USERINFO" | grep zimbraLastLogonTimestamp | cut -d " " -f 2 | cut -c 1-8)
     LOGON=$(date -d "$LASTDATE")
 	EXP_LIST=$(echo "$USER's password has been expired for ${DEADLINE#-} day(s) now, last logon was $LOGON.")
 	EXP_LIST2="$EXP_LIST2 \n $EXP_LIST"
 
-else 
+else
 # > /dev/null for less verbose logs and a list of users.
     echo "Account: $USER reports; $DEADLINE days on Password policy"
 fi
@@ -90,7 +95,7 @@ done
 
 echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
-# Send off list using hardcoded email addresses. 
+# Send off list using hardcoded email addresses.
 
 EXP_BODY="
 Hello Admin team,
