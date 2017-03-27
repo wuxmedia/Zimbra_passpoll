@@ -33,17 +33,17 @@ for USER in $USERS
 # When was the password set?
 USERINFO=$(ionice -c3 /opt/zimbra/bin/zmprov ga "$USER")
 PASS_SET_DATE=$(echo "$USERINFO" | grep zimbraPasswordModifiedTime: | cut -d " " -f 2 | cut -c 1-8)
-PASSWORD_MAX_AGE=$(echo "$USERINFO" | grep "zimbraPasswordMaxAge:" | cut -d " " -f 2)
+PASS_MAX_AGE=$(echo "$USERINFO" | grep "zimbraPasswordMaxAge:" | cut -d " " -f 2)
 NAME=$(echo "$USERINFO" | grep givenName | cut -d " " -f 2)
 
 # Check if we have set the account to no-expire
-if [[ "$PASSWORD_MAX_AGE" -eq "0" ]]
+if [[ "$PASS_MAX_AGE" -eq "0" ]]
 then
   continue
 fi
 
 # Make the date for expiry from now.
-EXPIRES=$(date -d  "$PASS_SET_DATE $POLICY days" +%s)
+EXPIRES=$(date -d  "$PASS_SET_DATE $PASS_MAX_AGE days" +%s)
 
 # Now, how many days until that?
 DEADLINE=$(( (($DATE - $EXPIRES)) / -86400 ))
