@@ -19,7 +19,11 @@ DOMAIN=""
 ADMIN_RECIPIENT="admin@example.com"
 
 # Sendmail executable
+# Uncomment line corresponding to your ZCS version
+#Before ZCS 8.9
 SENDMAIL=$(ionice -c3 find /opt/zimbra/postfix* -type f -iname sendmail)
+#From ZCS 8.9
+#SENDMAIL=$(ionice -c3 find /opt/zimbra/common/sbin -type f -iname sendmail)
 
 # Get all users - it should run once only.
 USERS=$(ionice -c3 /opt/zimbra/bin/zmprov -l gaa $DOMAIN)
