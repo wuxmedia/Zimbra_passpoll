@@ -1,4 +1,7 @@
 # Zimbra_passpoll
+
+***This is no longer maintained (I don't have access to a Zimbra install any more)***
+
 Zimbra password expiry email notification script. 
 * Requires ionice (or get rid of the reference) and Zimbra, obviously.
  
